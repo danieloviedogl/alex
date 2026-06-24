@@ -16,7 +16,18 @@ import sys
 import os
 import json
 import time
+import shutil
 from pathlib import Path
+
+
+def resolve_tool(tool):
+    """Resolve a CLI executable, preferring .cmd shims on Windows."""
+    if os.name == "nt":
+        for candidate in (f"{tool}.cmd", f"{tool}.exe", tool):
+            path = shutil.which(candidate)
+            if path:
+                return path
+    return shutil.which(tool)
 
 
 def run_command(cmd, cwd=None, check=True, capture_output=False, env=None):
@@ -49,26 +60,31 @@ def check_prerequisites():
     }
 
     for tool, message in tools.items():
+        tool_path = resolve_tool(tool)
+        if not tool_path:
+            print(f"  ❌ {message}")
+            sys.exit(1)
+
         try:
-            run_command([tool, "--version"], capture_output=True)
-            print(f"  ✅ {tool} is installed")
-        except (subprocess.CalledProcessError, FileNotFoundError):
+            run_command([tool_path, "--version"], capture_output=True)
+            print(f"  ✅ {tool} is installed ({tool_path})")
+        except subprocess.SubprocessError:
             print(f"  ❌ {message}")
             sys.exit(1)
 
     # Check if Docker is running
     try:
-        run_command(["docker", "info"], capture_output=True)
+        run_command([resolve_tool("docker"), "info"], capture_output=True)
         print("  ✅ Docker is running")
-    except subprocess.CalledProcessError:
+    except subprocess.SubprocessError:
         print("  ❌ Docker is not running. Please start Docker Desktop.")
         sys.exit(1)
 
     # Check AWS credentials
     try:
-        run_command(["aws", "sts", "get-caller-identity"], capture_output=True)
+        run_command([resolve_tool("aws"), "sts", "get-caller-identity"], capture_output=True)
         print("  ✅ AWS credentials configured")
-    except subprocess.CalledProcessError:
+    except subprocess.SubprocessError:
         print("  ❌ AWS credentials not configured. Run 'aws configure'")
         sys.exit(1)
 
@@ -108,9 +124,14 @@ def build_frontend(api_url=None):
 
     # Install dependencies if needed
     node_modules = frontend_dir / "node_modules"
+    npm_path = resolve_tool("npm")
+    if not npm_path:
+        print("  ❌ npm is required for building the frontend")
+        sys.exit(1)
+
     if not node_modules.exists():
         print("  Installing dependencies...")
-        run_command(["npm", "install"], cwd=frontend_dir)
+        run_command([npm_path, "install"], cwd=frontend_dir)
 
     # If API URL is provided, create .env.production.local to override .env.local
     if api_url:
@@ -152,7 +173,7 @@ def build_frontend(api_url=None):
     # Set NODE_ENV to production to ensure .env.production is used
     build_env = os.environ.copy()
     build_env["NODE_ENV"] = "production"
-    run_command(["npm", "run", "build"], cwd=frontend_dir, env=build_env)
+    run_command([npm_path, "run", "build"], cwd=frontend_dir, env=build_env)
 
     # Verify the build
     out_dir = frontend_dir / "out"

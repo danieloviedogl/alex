@@ -44,11 +44,11 @@ graph LR
     Lambda -->|Store| S3V[(S3 Vectors<br/>90% Cheaper!)]
     User -->|Search| S3V
     
-    style AR fill:#FF9900
-    style Bedrock fill:#FF9900
-    style S3V fill:#90EE90
-    style Schedule fill:#9333EA
-    style SchedLambda fill:#FF9900
+    style AR fill:#FBBF24,stroke:#92400E,color:#111
+    style Bedrock fill:#FBBF24,stroke:#92400E,color:#111
+    style S3V fill:#86EFAC,stroke:#166534,color:#111
+    style Schedule fill:#A78BFA,stroke:#5B21B6,color:#111
+    style SchedLambda fill:#FBBF24,stroke:#92400E,color:#111
 ```
 
 ## Step 0: Request Access to Bedrock Models

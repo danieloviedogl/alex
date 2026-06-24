@@ -8,6 +8,7 @@ import os
 import sys
 import subprocess
 import signal
+import shutil
 import time
 from pathlib import Path
 
@@ -42,10 +43,16 @@ def check_requirements():
         checks.append("❌ Node.js not found - please install Node.js")
 
     # Check npm
+    import shutil
+
     try:
-        result = subprocess.run(["npm", "--version"], capture_output=True, text=True)
+        npm_path = shutil.which("npm")
+        if not npm_path:
+            raise FileNotFoundError("npm not found in PATH")
+
+        result = subprocess.run([npm_path, "--version"], capture_output=True, text=True)
         npm_version = result.stdout.strip()
-        checks.append(f"✅ npm: {npm_version}")
+        checks.append(f"✅ npm: {npm_version} ({npm_path})")
     except FileNotFoundError:
         checks.append("❌ npm not found - please install npm")
 
@@ -135,17 +142,22 @@ def start_frontend():
 
     print("\n🚀 Starting NextJS frontend...")
 
+    npm_path = shutil.which("npm")
+    if not npm_path:
+        print("  ❌ npm not found")
+        cleanup()
+
     # Check if dependencies are installed
     if not (frontend_dir / "node_modules").exists():
         print("  Installing frontend dependencies...")
-        subprocess.run(["npm", "install"], cwd=frontend_dir, check=True)
+        subprocess.run([npm_path, "install"], cwd=frontend_dir, check=True)
 
     # Start the frontend
     proc = subprocess.Popen(
-        ["npm", "run", "dev"],
+        [npm_path, "run", "dev"],
         cwd=frontend_dir,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # Combine stderr with stdout
+        stderr=subprocess.STDOUT,
         text=True,
         bufsize=1
     )
@@ -154,33 +166,17 @@ def start_frontend():
     # Wait for frontend to start
     print("  Waiting for frontend to start...")
     import httpx
-    import select
 
-    started = False
-    for i in range(30):  # 30 second timeout
-        # Check for any output from the process using non-blocking read
-        if proc.stdout:
-            ready, _, _ = select.select([proc.stdout], [], [], 0)
-            if ready:
-                line = proc.stdout.readline()
-                if line:
-                    print(f"    Frontend: {line.strip()}")
-                    # NextJS dev server prints "Ready" when it's ready
-                    if "ready" in line.lower() or "compiled" in line.lower() or "started server" in line.lower():
-                        started = True
-
-        # Also try to connect
-        if started or i > 5:  # Start checking after 5 seconds or when we see "ready"
-            try:
-                response = httpx.get("http://localhost:3000", timeout=1)
-                print("  ✅ Frontend running at http://localhost:3000")
-                return proc
-            except httpx.ConnectError:
-                pass  # Server not ready yet
-            except:
-                # Any other response means server is up
-                print("  ✅ Frontend running at http://localhost:3000")
-                return proc
+    for i in range(30):
+        try:
+            response = httpx.get("http://localhost:3000", timeout=1)
+            print("  ✅ Frontend running at http://localhost:3000")
+            return proc
+        except httpx.ConnectError:
+            pass
+        except:
+            print("  ✅ Frontend running at http://localhost:3000")
+            return proc
 
         time.sleep(1)
 

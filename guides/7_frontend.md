@@ -36,10 +36,10 @@ graph TB
     SQS -->|Process| Agents[AI Agents]
     Agents -->|Results| Aurora
 
-    style CF fill:#FF9900
-    style S3 fill:#569A31
-    style Lambda fill:#FF9900
-    style Clerk fill:#6C5CE7
+    style CF fill:#E67E22,color:#FFFFFF,stroke:#A04000,stroke-width:2px
+    style S3 fill:#2E7D32,color:#FFFFFF,stroke:#1B5E20,stroke-width:2px
+    style Lambda fill:#F57C00,color:#FFFFFF,stroke:#E65100,stroke-width:2px
+    style Clerk fill:#5B21B6,color:#FFFFFF,stroke:#3B0764,stroke-width:2px
 ```
 
 ## Prerequisites

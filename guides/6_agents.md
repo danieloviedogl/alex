@@ -43,11 +43,11 @@ graph TB
     Planner -->|Finalize| DB
     DB -->|Results| User
     
-    style Planner fill:#FFD700
-    style Reporter fill:#90EE90
-    style Charter fill:#87CEEB
-    style Retirement fill:#DDA0DD
-    style Tagger fill:#FFB6C1
+    style Planner fill:#F59E0B,color:#FFFFFF,stroke:#B45309,stroke-width:2px
+    style Reporter fill:#10B981,color:#FFFFFF,stroke:#047857,stroke-width:2px
+    style Charter fill:#2563EB,color:#FFFFFF,stroke:#1E40AF,stroke-width:2px
+    style Retirement fill:#8B5CF6,color:#FFFFFF,stroke:#6D28D9,stroke-width:2px
+    style Tagger fill:#EC4899,color:#FFFFFF,stroke:#BE185D,stroke-width:2px
 ```
 
 ## Why Multi-Agent Architecture?

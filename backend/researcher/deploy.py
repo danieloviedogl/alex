@@ -176,28 +176,25 @@ def main():
     local_image = f"alex-researcher:{image_tag}"
     remote_image = f"{ecr_url}:{image_tag}"
 
-    # Build Docker image
-    print(f"\nBuilding Docker image for linux/amd64 with tag: {image_tag}")
+    # Build and push Docker image directly to ECR
+    print(f"\nBuilding and pushing Docker image for linux/amd64 with tag: {image_tag}")
     run_command(
         [
             "docker",
+            "buildx",
             "build",
             "--platform",
             "linux/amd64",
+            "--provenance=false",
+            "--sbom=false",
             "-t",
-            local_image,
+            remote_image,
+            "--push",
             ".",
         ],
         cwd=backend_dir,
     )
 
-    # Tag for ECR
-    print("\nTagging image for ECR...")
-    run_command(["docker", "tag", local_image, remote_image])
-
-    # Push to ECR
-    print("\nPushing image to ECR...")
-    run_command(["docker", "push", remote_image])
     print("\n✅ Docker image pushed successfully!")
 
     print("\nApplying Terraform with the new image...")
