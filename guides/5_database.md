@@ -61,9 +61,9 @@ graph TB
     Charter[Chart Maker] -->|Store Charts| Aurora
     Retirement[Retirement Specialist] -->|Store Projections| Aurora
 
-    style Aurora fill:#FF9900
-    style Planner fill:#FFD700
-    style API fill:#90EE90
+    style Aurora fill:#E67E22,stroke:#A04000,stroke-width:2px,color:#FFFFFF
+    style Planner fill:#F1C40F,stroke:#B7950B,stroke-width:2px,color:#000000
+    style API fill:#27AE60,stroke:#1E8449,stroke-width:2px,color:#FFFFFF
 ```
 
 ## Prerequisites

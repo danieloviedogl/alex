@@ -35,12 +35,12 @@ graph TB
     Lambda -->|Index| S3V[(S3 Vectors<br/>90% Cheaper!)]
     User -->|Search| S3V
     
-    style AR fill:#FF9900
-    style S3V fill:#90EE90
-    style SM fill:#10B981
-    style Schedule fill:#9333EA
-    style SchedLambda fill:#FF9900
-    style Bedrock fill:#FF9900
+    style AR fill:#2563EB,color:#FFFFFF
+    style S3V fill:#059669,color:#FFFFFF
+    style SM fill:#0F766E,color:#FFFFFF
+    style Schedule fill:#7C3AED,color:#FFFFFF
+    style SchedLambda fill:#DC2626,color:#FFFFFF
+    style Bedrock fill:#D97706,color:#FFFFFF
 ```
 
 See [architecture.md](architecture.md) for the complete system architecture.
